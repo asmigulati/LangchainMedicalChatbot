@@ -19,6 +19,7 @@ from langchain.callbacks import StreamlitCallbackHandler
 st.title("MedGPT👩‍⚕️")
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 openai.api_base = "https://asmi.openai.azure.com/"
+openai.api_type = 'azure'
 @st.cache(allow_output_mutation=True)
 def load_model():
     module_url = "https://tfhub.dev/google/universal-sentence-encoder/4"
