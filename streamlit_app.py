@@ -17,9 +17,16 @@ from langchain.agents import AgentType, initialize_agent, load_tools
 from langchain.callbacks import StreamlitCallbackHandler
 # Initialize the model
 st.title("MedGPT👩‍⚕️")
-openai.api_key = st.secrets["OPENAI_API_KEY"]
-openai.api_base = "https://asmi.openai.azure.com/"
-openai.api_type = 'azure'
+# Create a Streamlit sidebar to input the API key
+st.sidebar.write("## API Key")
+api_key = st.sidebar.text_input("Enter your OpenAI API key:")
+
+# Load your API key from Streamlit secrets or user input
+if api_key:
+    openai.api_key = api_key
+else:
+    st.warning("Please enter your OpenAI API key in the sidebar to use the app.")
+
 @st.cache(allow_output_mutation=True)
 def load_model():
     module_url = "https://tfhub.dev/google/universal-sentence-encoder/4"
