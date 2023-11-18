@@ -1,0 +1,7 @@
+streamlit
+pandas
+numpy
+tensorflow_hub
+langchain
+openai
+tensorflow
