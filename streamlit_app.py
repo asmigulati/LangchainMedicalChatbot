@@ -10,11 +10,13 @@ from langchain.chat_models import ChatOpenAI
 from langchain.agents import OpenAIMultiFunctionsAgent, AgentExecutor
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import MessagesPlaceholder
+from langchain.memory import StreamlitChatMessageHistory
 import openai
 from langchain.llms import OpenAI
 from langchain.agents import AgentType, initialize_agent, load_tools
 from langchain.callbacks import StreamlitCallbackHandler
 # Initialize the model
+st.title("MedGPT👩‍⚕️")
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 @st.cache(allow_output_mutation=True)
 def load_model():
@@ -175,7 +177,11 @@ tools_list = [
     ArchivalMemorySearchTool()]
 llm = ChatOpenAI(temperature=0, model="gpt-4-0613")
 _system_message = memgpt.system_instruction
-memory = ConversationBufferMemory(memory_key="memory", return_messages=True)
+# Optionally, specify your own session_state key for storing messages
+msgs = StreamlitChatMessageHistory(key="Langapp")
+memory = ConversationBufferMemory(memory_key="memory", return_messages=True,chat_memory=msgs)
+if len(msgs.messages) == 0:
+    msgs.add_ai_message("How can I help you?")
 prompt = OpenAIMultiFunctionsAgent.create_prompt(
     system_message=SystemMessage(content=_system_message),
     extra_prompt_messages=[MessagesPlaceholder(variable_name="memory")]
@@ -189,6 +195,10 @@ agent_executor = AgentExecutor(
     memory=memory,
     verbose=True,
 )
+# Render current messages from StreamlitChatMessageHistory
+for msg in msgs.messages:
+    st.chat_message(msg.type).write(msg.content)
+
 if prompt := st.chat_input():
     st.chat_message("user").write(prompt)
     with st.chat_message("assistant"):
